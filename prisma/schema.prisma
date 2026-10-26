@@ -1,0 +1,136 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Audit {
+  id               String            @id @default(cuid())
+  storeUrl         String
+  hostname         String
+  status           String            @default("PENDING") // PENDING, DISCOVERING, CRAWLING, ANALYZING, FINALIZING, COMPLETED, PARTIAL, FAILED, CANCELLED
+  errorMessage     String?
+  maxPages         Int               @default(25)
+  deviceStrategy   String            @default("mobile")
+  runPageSpeed     Boolean           @default(true)
+  healthScore      Int?
+  techSeoScore     Int?
+  onPageScore      Int?
+  perfScore        Int?
+  pagesDiscovered  Int               @default(0)
+  pagesCrawled     Int               @default(0)
+  pagesFailed      Int               @default(0)
+  findingsCount    Int               @default(0)
+  startedAt        DateTime?
+  completedAt      DateTime?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  pages            DiscoveredPage[]
+  findings         Finding[]
+  pageSpeedResults PageSpeedMetric[]
+  remediations     Remediation[]
+
+  @@index([hostname])
+  @@index([status])
+}
+
+model DiscoveredPage {
+  id                 String    @id @default(cuid())
+  auditId            String
+  url                String
+  path               String
+  template           String    @default("unknown")
+  statusCode         Int?
+  title              String?
+  metaDescription    String?
+  canonicalUrl       String?
+  wordCount          Int       @default(0)
+  h1Count            Int       @default(0)
+  imageCount         Int       @default(0)
+  imagesWithoutAlt   Int       @default(0)
+  internalLinksCount Int       @default(0)
+  externalLinksCount Int       @default(0)
+  isIndexable        Boolean   @default(true)
+  crawlError         String?
+  crawledAt          DateTime?
+
+  audit              Audit     @relation(fields: [auditId], references: [id], onDelete: Cascade)
+  findings           Finding[]
+
+  @@index([auditId])
+  @@index([url])
+}
+
+model Finding {
+  id              String          @id @default(cuid())
+  auditId         String
+  pageId          String?
+  url             String
+  template        String          @default("unknown")
+  ruleId          String
+  category        String          // technical_seo, on_page_seo, structured_data, performance, accessibility
+  severity        String          // critical, high, medium, low, info
+  title           String
+  description     String
+  impact          String
+  remediation     String
+  scoreImpact     Int             @default(0)
+  elementSelector String?
+  evidence        String?         // JSON context
+  confidence      String          @default("high")
+  status          String          @default("open") // open, in_progress, fixed, ignored
+  createdAt       DateTime        @default(now())
+
+  audit           Audit           @relation(fields: [auditId], references: [id], onDelete: Cascade)
+  page            DiscoveredPage? @relation(fields: [pageId], references: [id], onDelete: SetNull)
+
+  @@index([auditId])
+  @@index([ruleId])
+  @@index([category])
+  @@index([severity])
+  @@index([status])
+}
+
+model PageSpeedMetric {
+  id                      String    @id @default(cuid())
+  auditId                 String
+  url                     String
+  strategy                String    // mobile, desktop
+  performanceScore        Int?
+  fcpMs                   Float?
+  lcpMs                   Float?
+  cls                     Float?
+  tbtMs                   Float?
+  speedIndexMs            Float?
+  fieldLcpMs              Float?
+  fieldCls                Float?
+  fieldInpMs              Float?
+  thirdPartyScriptsCount  Int       @default(0)
+  thirdPartyTransferBytes Int       @default(0)
+  rawDiagnostics          String?
+  createdAt               DateTime  @default(now())
+
+  audit                   Audit     @relation(fields: [auditId], references: [id], onDelete: Cascade)
+
+  @@index([auditId])
+  @@index([url])
+}
+
+model Remediation {
+  id          String   @id @default(cuid())
+  auditId     String
+  findingId   String
+  status      String   // open, in_progress, fixed, ignored
+  notes       String?
+  updatedBy   String   @default("user")
+  updatedAt   DateTime @default(now())
+
+  audit       Audit    @relation(fields: [auditId], references: [id], onDelete: Cascade)
+
+  @@index([auditId])
+  @@index([findingId])
+}
