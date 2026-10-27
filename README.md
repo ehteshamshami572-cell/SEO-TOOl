@@ -130,4 +130,5 @@ Services:
 - [Security & SSRF Guard](docs/security.md)
 - [Audit Rules Catalog](docs/audit-rules.md)
 - [Deployment Guide](docs/deployment.md)
+- [Netlify Deployment Guide](docs/netlify-deployment.md)
 - [API Reference](docs/api.md)

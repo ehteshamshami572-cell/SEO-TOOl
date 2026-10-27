@@ -29,5 +29,8 @@ export const env: Env = envSchema.parse({
   REQUEST_TIMEOUT_MS: process.env.REQUEST_TIMEOUT_MS,
   MAX_RESPONSE_SIZE_BYTES: process.env.MAX_RESPONSE_SIZE_BYTES,
   RATE_LIMIT_DELAY_MS: process.env.RATE_LIMIT_DELAY_MS,
-  NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+  NEXT_PUBLIC_APP_URL:
+    process.env.NEXT_PUBLIC_APP_URL ||
+    process.env.URL ||
+    "http://localhost:3000",
 });
