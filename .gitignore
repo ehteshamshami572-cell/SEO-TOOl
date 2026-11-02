@@ -6,6 +6,10 @@ build/
 *.db-journal
 .env
 .env.local
+.env.*
+!.env.example
+.netlify/
+*.tsbuildinfo
 .DS_Store
 *.log
 .neon

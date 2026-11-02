@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 
+// Database checks require runtime credentials and must never become build artifacts.
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     await prisma.$queryRaw`SELECT 1`;
@@ -9,13 +12,13 @@ export async function GET() {
       timestamp: new Date().toISOString(),
       database: "connected",
     });
-  } catch (err) {
+  } catch {
     return NextResponse.json(
       {
         status: "error",
         timestamp: new Date().toISOString(),
         database: "disconnected",
-        error: err instanceof Error ? err.message : String(err),
+        error: "Database health check failed",
       },
       { status: 503 }
     );

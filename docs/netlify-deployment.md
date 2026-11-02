@@ -83,6 +83,22 @@ In the Netlify setup screen (or under **Site configuration** > **Environment var
 
 ## Step 6: Deploy and Verify
 
+### Troubleshooting secrets scanning
+
+Keep credentials in Netlify environment variables, with the Functions scope enabled
+for server runtime access. Never put private values in `NEXT_PUBLIC_*` variables or
+the `env` option in `next.config.js`, which embeds values into bundles.
+Environment files are ignored by Git and excluded from Next.js server file tracing.
+The database health endpoint runs at request time and returns a generic failure
+message so database exceptions cannot become prerendered build output.
+
+If secrets scanning fails, inspect the variable names and file paths listed just
+above the scanner error. The resolved configuration's environment-variable list
+alone does not identify which values matched. Remove the exposed value from the
+reported source or generated artifact and rotate any credential that was exposed.
+Keep scanning enabled; do not exclude database credentials or entire build folders.
+After fixing the reported matches, deploy again to verify the scanner passes.
+
 1. Click **Deploy site**.
 2. Once the build finishes (usually ~1–2 minutes), your site will be live at `https://<your-site-name>.netlify.app`.
 3. Verify system health by visiting:
