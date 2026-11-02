@@ -14,6 +14,10 @@ const nextConfig = {
     ],
   },
   experimental: {
+    // Runtime environment files must not be copied into server function bundles.
+    outputFileTracingExcludes: {
+      "*": ["./.env", "./.env.*", "./**/.env", "./**/.env.*"],
+    },
     serverComponentsExternalPackages: ["@prisma/client", "prisma", "bullmq", "ioredis"],
   },
 };
