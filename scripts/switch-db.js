@@ -4,7 +4,17 @@ const path = require("node:path");
 let targetProvider = process.argv[2];
 
 if (!targetProvider) {
-  const dbUrl = process.env.DATABASE_URL || "";
+  let dbUrl = process.env.DATABASE_URL || "";
+  if (!dbUrl) {
+    try {
+      const envPath = path.join(__dirname, "..", ".env");
+      if (fs.existsSync(envPath)) {
+        const envContent = fs.readFileSync(envPath, "utf-8");
+        const match = envContent.match(/^DATABASE_URL=["']?([^"'\r\n]+)["']?/m);
+        if (match) dbUrl = match[1];
+      }
+    } catch {}
+  }
   if (dbUrl.startsWith("postgres://") || dbUrl.startsWith("postgresql://")) {
     targetProvider = "postgresql";
   } else if (dbUrl.startsWith("file:")) {
