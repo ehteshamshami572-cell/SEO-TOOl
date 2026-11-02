@@ -19,6 +19,11 @@ const envSchema = z.object({
 
   // Neon Services
   NEON_AUTH_BASE_URL: z.string().optional(),
+  NEON_STORAGE_ENDPOINT: z.string().optional(),
+  NEON_STORAGE_ACCESS_KEY_ID: z.string().optional(),
+  NEON_STORAGE_SECRET_ACCESS_KEY: z.string().optional(),
+  NEON_STORAGE_REGION: z.string().optional().default("ap-southeast-1"),
+  NEON_STORAGE_BUCKET: z.string().optional().default("uploads"),
   AWS_ENDPOINT_URL_S3: z.string().optional(),
   AWS_ACCESS_KEY_ID: z.string().optional(),
   AWS_SECRET_ACCESS_KEY: z.string().optional(),
@@ -50,6 +55,19 @@ export const env: Env = envSchema.parse({
 
   // Neon Services
   NEON_AUTH_BASE_URL: process.env.NEON_AUTH_BASE_URL,
+  NEON_STORAGE_ENDPOINT:
+    process.env.NEON_STORAGE_ENDPOINT || process.env.AWS_ENDPOINT_URL_S3,
+  NEON_STORAGE_ACCESS_KEY_ID:
+    process.env.NEON_STORAGE_ACCESS_KEY_ID || process.env.AWS_ACCESS_KEY_ID,
+  NEON_STORAGE_SECRET_ACCESS_KEY:
+    process.env.NEON_STORAGE_SECRET_ACCESS_KEY ||
+    process.env.AWS_SECRET_ACCESS_KEY,
+  NEON_STORAGE_REGION:
+    process.env.NEON_STORAGE_REGION ||
+    process.env.AWS_REGION ||
+    "ap-southeast-1",
+  NEON_STORAGE_BUCKET:
+    process.env.NEON_STORAGE_BUCKET || process.env.S3_BUCKET || "uploads",
   AWS_ENDPOINT_URL_S3: process.env.AWS_ENDPOINT_URL_S3,
   AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,
   AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,

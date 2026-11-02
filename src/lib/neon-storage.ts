@@ -16,10 +16,27 @@ export class NeonStorage {
       return this.client;
     }
 
-    const endpoint = env.AWS_ENDPOINT_URL_S3 || process.env.AWS_ENDPOINT_URL_S3;
-    const accessKeyId = env.AWS_ACCESS_KEY_ID || process.env.AWS_ACCESS_KEY_ID;
-    const secretAccessKey = env.AWS_SECRET_ACCESS_KEY || process.env.AWS_SECRET_ACCESS_KEY;
-    const region = env.AWS_REGION || process.env.AWS_REGION || "ap-southeast-1";
+    const endpoint =
+      env.NEON_STORAGE_ENDPOINT ||
+      process.env.NEON_STORAGE_ENDPOINT ||
+      env.AWS_ENDPOINT_URL_S3 ||
+      process.env.AWS_ENDPOINT_URL_S3;
+    const accessKeyId =
+      env.NEON_STORAGE_ACCESS_KEY_ID ||
+      process.env.NEON_STORAGE_ACCESS_KEY_ID ||
+      env.AWS_ACCESS_KEY_ID ||
+      process.env.AWS_ACCESS_KEY_ID;
+    const secretAccessKey =
+      env.NEON_STORAGE_SECRET_ACCESS_KEY ||
+      process.env.NEON_STORAGE_SECRET_ACCESS_KEY ||
+      env.AWS_SECRET_ACCESS_KEY ||
+      process.env.AWS_SECRET_ACCESS_KEY;
+    const region =
+      env.NEON_STORAGE_REGION ||
+      process.env.NEON_STORAGE_REGION ||
+      env.AWS_REGION ||
+      process.env.AWS_REGION ||
+      "ap-southeast-1";
 
     if (!endpoint || !accessKeyId || !secretAccessKey) {
       return null;
@@ -43,7 +60,13 @@ export class NeonStorage {
   }
 
   public static getBucketName(): string {
-    return env.S3_BUCKET || process.env.S3_BUCKET || "assets";
+    return (
+      env.NEON_STORAGE_BUCKET ||
+      process.env.NEON_STORAGE_BUCKET ||
+      env.S3_BUCKET ||
+      process.env.S3_BUCKET ||
+      "assets"
+    );
   }
 
   /**
@@ -69,10 +92,13 @@ export class NeonStorage {
 
     await s3.send(command);
 
-    const endpoint = (env.AWS_ENDPOINT_URL_S3 || process.env.AWS_ENDPOINT_URL_S3 || "").replace(
-      /\/+$/,
+    const endpoint = (
+      env.NEON_STORAGE_ENDPOINT ||
+      process.env.NEON_STORAGE_ENDPOINT ||
+      env.AWS_ENDPOINT_URL_S3 ||
+      process.env.AWS_ENDPOINT_URL_S3 ||
       ""
-    );
+    ).replace(/\/+$/, "");
     const url = `${endpoint}/${bucket}/${key}`;
 
     logger.info("Uploaded object to Neon Object Storage", { key, bucket, url });
